@@ -1,0 +1,61 @@
+openapi: 3.0.0
+info:
+  title: Tecnofit API
+  version: 1.0.0
+  description: API para gerenciamento de recordes pessoais de movimentos
+servers:
+  - url: /
+    description: API Server
+paths:
+  /movements/{id}/ranking:
+    get:
+      summary: Retorna o ranking de um movimento específico
+      tags:
+        - Movements
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do movimento
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Ranking do movimento
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  movement:
+                    type: string
+                    example: Deadlift
+                  ranking:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        position:
+                          type: integer
+                          example: 1
+                        user:
+                          type: string
+                          example: Jose
+                        value:
+                          type: number
+                          format: float
+                          example: 190.0
+                        date:
+                          type: string
+                          format: datetime
+                          example: "2021-01-06 00:00:00"
+        '404':
+          description: Movimento não encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Movement not found 
