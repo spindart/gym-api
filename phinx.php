@@ -12,11 +12,11 @@ return [
         'default_environment' => 'development',
         'development' => [
             'adapter' => 'mysql',
-            'host' => DB_HOST,
-            'name' => DB_NAME,
-            'user' => DB_USER,
-            'pass' => DB_PASS,
-            'port' => DB_PORT,
+            'host' => getenv('DB_HOST') ?: 'localhost',
+            'name' => getenv('DB_NAME') ?: 'tecnofit',
+            'user' => getenv('DB_USER') ?: 'root',
+            'pass' => getenv('DB_PASS') ?: '',
+            'port' => getenv('DB_PORT') ?: '3306',
             'charset' => 'utf8',
         ]
     ],

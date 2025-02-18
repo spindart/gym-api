@@ -45,10 +45,22 @@ class GetMovementRankingTest extends TestCase
 
     public function testGetRankingSuccessfully()
     {
-        $this->cache->shouldReceive('get')->once()->andReturn(null);
-        $this->cache->shouldReceive('set')->once();
-
         $movementId = 1;
+        $page = 1;
+        $limit = 10;
+        $cacheKey = "ranking:{$movementId}:page:{$page}:limit:{$limit}";
+
+        $this->cache
+            ->shouldReceive('get')
+            ->with($cacheKey)
+            ->once()
+            ->andReturn(null);
+
+        $this->cache
+            ->shouldReceive('set')
+            ->with($cacheKey, Mockery::any(), 3600)
+            ->once();
+
         $movement = new Movement($movementId, 'Deadlift');
         
         $record1 = new PersonalRecord(1, 'John', 200.0, new DateTime('2021-01-01'));
@@ -65,17 +77,17 @@ class GetMovementRankingTest extends TestCase
 
         $this->personalRecordRepository
             ->shouldReceive('findRankingByMovementId')
-            ->with($movementId, 1, 10)
+            ->with($movementId, $page, $limit)
             ->once()
             ->andReturn([$record1, $record2]);
-
+        
         $this->personalRecordRepository
             ->shouldReceive('countRankingByMovementId')
             ->with($movementId)
             ->once()
             ->andReturn(2);
 
-        $result = $this->useCase->execute($movementId);
+        $result = $this->useCase->execute($movementId, $page, $limit);
 
         $expected = [
             'movement' => 'Deadlift',
@@ -136,13 +148,22 @@ class GetMovementRankingTest extends TestCase
 
     public function testExecuteWithPagination()
     {
-        $this->cache->shouldReceive('get')->once()->andReturn(null);
-        $this->cache->shouldReceive('set')->once();
-
         $movementId = 1;
         $page = 2;
         $limit = 2;
-        
+        $cacheKey = "ranking:{$movementId}:page:{$page}:limit:{$limit}";
+
+        $this->cache
+            ->shouldReceive('get')
+            ->with($cacheKey)
+            ->once()
+            ->andReturn(null);
+
+        $this->cache
+            ->shouldReceive('set')
+            ->with($cacheKey, Mockery::any(), 3600)
+            ->once();
+
         $movement = new Movement($movementId, 'Deadlift');
         
         $record1 = new PersonalRecord(1, 'User1', 100.0, new DateTime());
