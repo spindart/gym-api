@@ -26,9 +26,32 @@ $app->get('/', function (Request $request, Response $response) {
                 'method' => 'GET',
                 'description' => 'Obter ranking de movimentos pelo ID do movimento',
                 'parameters' => [
-                    'id' => 'Movement ID (integer)'
+                    'path' => [
+                        'id' => 'Movement ID (integer)'
+                    ],
+                    'query' => [
+                        'page' => 'Número da página (integer, default: 1)',
+                        'limit' => 'Itens por página (integer, default: 10)'
+                    ]
                 ],
-                'example' => '/movements/1/ranking'
+                'example' => '/movements/1/ranking?page=1&limit=10',
+                'response' => [
+                    'movement' => 'string',
+                    'ranking' => [
+                        [
+                            'position' => 'integer',
+                            'user' => 'string',
+                            'value' => 'number',
+                            'date' => 'datetime'
+                        ]
+                    ],
+                    'pagination' => [
+                        'current_page' => 'integer',
+                        'per_page' => 'integer',
+                        'total_items' => 'integer',
+                        'total_pages' => 'integer'
+                    ]
+                ]
             ]
         ]
     ];

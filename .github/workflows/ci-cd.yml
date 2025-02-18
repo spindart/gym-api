@@ -41,6 +41,19 @@ jobs:
         composer update
         composer install --prefer-dist --no-progress
 
+    - name: Wait for MySQL
+      run: |
+        timeout=300
+        while ! mysqladmin ping -h"127.0.0.1" -P"3306" -u"root" -p"root" --silent; do
+          echo "Waiting for MySQL to be ready..."
+          sleep 2
+          timeout=$((timeout - 2))
+          if [ $timeout -le 0 ]; then
+            echo "Timeout waiting for MySQL"
+            exit 1
+          fi
+        done
+
     - name: Run database migrations
       run: composer migrate
       env:
@@ -48,6 +61,9 @@ jobs:
         DB_NAME: tecnofit
         DB_USER: root
         DB_PASS: root
+        DB_PORT: 3306
+      timeout-minutes: 5
+      if: always()
 
     - name: Run tests with coverage
       run: vendor/bin/phpunit --coverage-clover coverage.xml

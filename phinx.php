@@ -19,5 +19,6 @@ return [
             'port' => DB_PORT,
             'charset' => 'utf8',
         ]
-    ]
+    ],
+    'version_order' => 'creation'
 ];
