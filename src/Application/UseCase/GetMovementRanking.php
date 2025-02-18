@@ -23,9 +23,13 @@ class GetMovementRanking
         $this->cache = $cache;
     }
 
-    public function execute(int $movementId, int $page = 1, int $limit = 10): array
-    {
-        $cacheKey = "ranking:{$movementId}:page:{$page}:limit:{$limit}";
+    public function execute(
+        int $movementId,
+        int $page = 1,
+        int $limit = 10,
+        bool $onlyBest = true
+    ): array {
+        $cacheKey = "ranking:{$movementId}:page:{$page}:limit:{$limit}:onlyBest:{$onlyBest}";
 
         $cachedResult = $this->cache->get($cacheKey);
         if ($cachedResult !== null) {
@@ -37,12 +41,16 @@ class GetMovementRanking
             throw new MovementNotFoundException();
         }
 
-        $ranking = $this->personalRecordRepository->findRankingByMovementId($movementId, $page, $limit);
-        $total = $this->personalRecordRepository->countRankingByMovementId($movementId);
+        $ranking = $this->personalRecordRepository->findRankingByMovementId($movementId, $page, $limit, $onlyBest);
+        $total = $this->personalRecordRepository->countRankingByMovementId($movementId, $onlyBest);
 
         $result = [
             'movement' => $movement->getName(),
-            'ranking' => array_map(fn($record) => $record->toArray(), $ranking),
+            'ranking' => array_map(function ($record) {
+                $data = $record->toArray();
+                $data['user_id'] = $record->getUserId();
+                return $data;
+            }, $ranking),
             'pagination' => [
                 'current_page' => $page,
                 'per_page' => $limit,

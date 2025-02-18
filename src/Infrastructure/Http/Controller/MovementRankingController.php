@@ -49,6 +49,13 @@ class MovementRankingController
      *         description="Itens por página",
      *         @OA\Schema(type="integer", default=10)
      *     ),
+     *     @OA\Parameter(
+     *         name="only_best",
+     *         in="query",
+     *         required=false,
+     *         description="Retorna apenas o melhor resultado de cada usuário",
+     *         @OA\Schema(type="boolean", default=true)
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="Ranking do movimento",
@@ -57,6 +64,7 @@ class MovementRankingController
      *             @OA\Property(property="ranking", type="array",
      *                 @OA\Items(
      *                     @OA\Property(property="position", type="integer"),
+     *                     @OA\Property(property="user_id", type="integer"),
      *                     @OA\Property(property="user", type="string"),
      *                     @OA\Property(property="value", type="number"),
      *                     @OA\Property(property="date", type="string", format="date-time")
@@ -72,24 +80,33 @@ class MovementRankingController
      *     ),
      *     @OA\Response(
      *         response=404,
-     *         description="Movimento não encontrado"
+     *         description="Movimento não encontrado",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string")
+     *         )
      *     )
      * )
      */
     public function __invoke(Request $request, Response $response, array $args): Response
     {
-        $id = (int) $args['id'];
-        $queryParams = $request->getQueryParams();
-        $page = isset($queryParams['page']) ? (int) $queryParams['page'] : 1;
-        $limit = isset($queryParams['limit']) ? (int) $queryParams['limit'] : 10;
+        $movementId = (int) $args['id'];
+        $page = (int) ($request->getQueryParams()['page'] ?? 1);
+        $limit = (int) ($request->getQueryParams()['limit'] ?? 10);
+        $onlyBest = filter_var($request->getQueryParams()['only_best'] ?? 'true', FILTER_VALIDATE_BOOLEAN);
 
         try {
-            $result = $this->useCase->execute($id, $page, $limit);
-            $response->getBody()->write(json_encode($result, JSON_PRETTY_PRINT));
-            return $response->withHeader('Content-Type', 'application/json');
+            $result = $this->useCase->execute($movementId, $page, $limit, $onlyBest);
+            return $this->json($response, $result);
         } catch (MovementNotFoundException $e) {
-            $response->getBody()->write(json_encode(['error' => 'Movement not found']));
-            return $response->withStatus(404)->withHeader('Content-Type', 'application/json');
+            return $this->json($response->withStatus(404), [
+                'error' => 'Movement not found'
+            ]);
         }
+    }
+
+    private function json(Response $response, array $data): Response
+    {
+        $response->getBody()->write(json_encode($data, JSON_PRETTY_PRINT));
+        return $response->withHeader('Content-Type', 'application/json');
     }
 }

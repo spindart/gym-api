@@ -17,49 +17,9 @@ $app = AppFactory::create();
 $app->addErrorMiddleware(true, true, true);
 
 $app->get('/', function (Request $request, Response $response) {
-    $docs = [
-        'api' => 'Movement Ranking API',
-        'version' => '1.0.0',
-        'endpoints' => [
-            [
-                'path' => '/movements/{id}/ranking',
-                'method' => 'GET',
-                'description' => 'Obter ranking de movimentos pelo ID do movimento',
-                'parameters' => [
-                    'path' => [
-                        'id' => 'Movement ID (integer)'
-                    ],
-                    'query' => [
-                        'page' => 'Número da página (integer, default: 1)',
-                        'limit' => 'Itens por página (integer, default: 10)'
-                    ]
-                ],
-                'example' => '/movements/1/ranking?page=1&limit=10',
-                'response' => [
-                    'movement' => 'string',
-                    'ranking' => [
-                        [
-                            'position' => 'integer',
-                            'user' => 'string',
-                            'value' => 'number',
-                            'date' => 'datetime'
-                        ]
-                    ],
-                    'pagination' => [
-                        'current_page' => 'integer',
-                        'per_page' => 'integer',
-                        'total_items' => 'integer',
-                        'total_pages' => 'integer'
-                    ]
-                ]
-            ]
-        ]
-    ];
-    
-    $response->getBody()->write(json_encode($docs, JSON_PRETTY_PRINT));
     return $response
-        ->withHeader('Content-Type', 'application/json')
-        ->withStatus(200);
+        ->withHeader('Location', '/docs')
+        ->withStatus(302);
 });
 
 $app->get('/movements/{id}/ranking', MovementRankingController::class);

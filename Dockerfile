@@ -13,6 +13,8 @@ COPY php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
 
 WORKDIR /var/www
 
+RUN mkdir -p /var/www/public
+
 COPY composer.lock composer.json ./
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN composer install
@@ -21,7 +23,8 @@ COPY . .
 COPY init.sh /usr/local/bin/init.sh
 RUN chmod +x /usr/local/bin/init.sh
 
-RUN chown -R www-data:www-data /var/www
+RUN chown -R www-data:www-data /var/www && \
+    chmod -R 755 /var/www
 
 EXPOSE 9000
 

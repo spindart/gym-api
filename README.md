@@ -159,7 +159,7 @@ A API é documentada usando OpenAPI/Swagger. Você pode acessar a documentação
 ### Consultar Ranking de Movimento
 
 ```http
-GET /movements/{id}/ranking?page=1&limit=10
+GET /movements/{id}/ranking?page=1&limit=10&only_best=false
 ```
 
 #### Parâmetros
@@ -167,6 +167,8 @@ GET /movements/{id}/ranking?page=1&limit=10
 - `id` (obrigatório): ID do movimento
 - `page` (opcional): Página atual (padrão: 1)
 - `limit` (opcional): Itens por página (padrão: 10)
+- `only_best` (opcional): Retorna apenas o melhor resultado de cada usuário (default: true)
+
 
 #### Exemplo de Resposta
 
@@ -178,7 +180,8 @@ GET /movements/{id}/ranking?page=1&limit=10
             "position": 1,
             "user": "John",
             "value": 200.0,
-            "date": "2021-01-01 00:00:00"
+            "date": "2021-01-01 00:00:00",
+            "user_id": 4
         }
     ],
     "pagination": {

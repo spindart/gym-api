@@ -17,8 +17,19 @@ services:
       dockerfile: Dockerfile
     volumes:
       - .:/var/www
+    environment:
+      - DB_HOST=db
+      - DB_NAME=tecnofit
+      - DB_USER=root
+      - DB_PASS=root
+      - DB_PORT=3306
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "php-fpm", "-t"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     depends_on:
       redis:
         condition: service_healthy
@@ -43,20 +54,24 @@ services:
     environment:
       MYSQL_DATABASE: tecnofit
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
+      MYSQL_ROOT_HOST: '%'
     ports:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
     networks:
       - app-network
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --skip-host-cache
+      --skip-name-resolve
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
       interval: 5s
       timeout: 5s
       retries: 5
-    command: --default-authentication-plugin=mysql_native_password
 
 networks:
   app-network:

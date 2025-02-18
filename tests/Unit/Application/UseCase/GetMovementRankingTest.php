@@ -49,37 +49,46 @@ class GetMovementRankingTest extends TestCase
         $movementId = 1;
         $page = 1;
         $limit = 10;
-        $cacheKey = "ranking:{$movementId}:page:{$page}:limit:{$limit}";
+        $onlyBest = true;
+        $cacheKey = "ranking:{$movementId}:page:{$page}:limit:{$limit}:onlyBest:1";
+
         $this->cache
             ->shouldReceive('get')
             ->with($cacheKey)
             ->once()
             ->andReturn(null);
+
         $this->cache
             ->shouldReceive('set')
             ->with($cacheKey, Mockery::any(), 3600)
             ->once();
+
         $movement = new Movement($movementId, 'Deadlift');
         $record1 = new PersonalRecord(1, 'John', 200.0, new DateTime('2021-01-01'));
         $record1->setPosition(1);
         $record2 = new PersonalRecord(2, 'Jane', 180.0, new DateTime('2021-01-02'));
         $record2->setPosition(2);
+
         $this->movementRepository
             ->shouldReceive('findById')
             ->with($movementId)
             ->once()
             ->andReturn($movement);
+
         $this->personalRecordRepository
             ->shouldReceive('findRankingByMovementId')
-            ->with($movementId, $page, $limit)
+            ->with($movementId, $page, $limit, $onlyBest)
             ->once()
             ->andReturn([$record1, $record2]);
+
         $this->personalRecordRepository
             ->shouldReceive('countRankingByMovementId')
-            ->with($movementId)
+            ->with($movementId, $onlyBest)
             ->once()
             ->andReturn(2);
-        $result = $this->useCase->execute($movementId, $page, $limit);
+
+        $result = $this->useCase->execute($movementId, $page, $limit, $onlyBest);
+
         $expected = [
             'movement' => 'Deadlift',
             'ranking' => [
@@ -87,13 +96,15 @@ class GetMovementRankingTest extends TestCase
                     'position' => 1,
                     'user' => 'John',
                     'value' => 200.0,
-                    'date' => '2021-01-01 00:00:00'
+                    'date' => '2021-01-01 00:00:00',
+                    'user_id' => 1
                 ],
                 [
                     'position' => 2,
                     'user' => 'Jane',
                     'value' => 180.0,
-                    'date' => '2021-01-02 00:00:00'
+                    'date' => '2021-01-02 00:00:00',
+                    'user_id' => 2
                 ]
             ],
             'pagination' => [
@@ -103,6 +114,7 @@ class GetMovementRankingTest extends TestCase
                 'total_pages' => 1
             ]
         ];
+
         $this->assertEquals($expected, $result);
     }
 
@@ -110,23 +122,34 @@ class GetMovementRankingTest extends TestCase
     {
         $cachedData = [
             'movement' => 'Deadlift',
-            'ranking' => [],
+            'ranking' => [
+                [
+                    'position' => 1,
+                    'user' => 'John',
+                    'value' => 200.0,
+                    'date' => '2021-01-01 00:00:00',
+                    'user_id' => 1
+                ]
+            ],
             'pagination' => [
                 'current_page' => 1,
                 'per_page' => 10,
-                'total_items' => 0,
-                'total_pages' => 0
+                'total_items' => 1,
+                'total_pages' => 1
             ]
         ];
+
         $this->cache
             ->shouldReceive('get')
             ->once()
-            ->with("ranking:1:page:1:limit:10")
+            ->with("ranking:1:page:1:limit:10:onlyBest:1")
             ->andReturn(json_encode($cachedData));
+
         $this->movementRepository->shouldNotReceive('findById');
         $this->personalRecordRepository->shouldNotReceive('findRankingByMovementId');
         $this->personalRecordRepository->shouldNotReceive('countRankingByMovementId');
         $this->cache->shouldNotReceive('set');
+
         $result = $this->useCase->execute(1);
         $this->assertEquals($cachedData, $result);
     }
@@ -136,38 +159,47 @@ class GetMovementRankingTest extends TestCase
         $movementId = 1;
         $page = 2;
         $limit = 2;
-        $cacheKey = "ranking:{$movementId}:page:{$page}:limit:{$limit}";
+        $onlyBest = true;
+        $cacheKey = "ranking:{$movementId}:page:{$page}:limit:{$limit}:onlyBest:1";
+
         $this->cache
             ->shouldReceive('get')
             ->with($cacheKey)
             ->once()
             ->andReturn(null);
+
         $this->cache
             ->shouldReceive('set')
             ->with($cacheKey, Mockery::any(), 3600)
             ->once();
+
         $movement = new Movement($movementId, 'Deadlift');
         $record1 = new PersonalRecord(1, 'User1', 100.0, new DateTime());
         $record1->setPosition(3);
         $record2 = new PersonalRecord(2, 'User2', 90.0, new DateTime());
         $record2->setPosition(4);
         $records = [$record1, $record2];
+
         $this->movementRepository
             ->shouldReceive('findById')
             ->with($movementId)
             ->once()
             ->andReturn($movement);
+
         $this->personalRecordRepository
             ->shouldReceive('findRankingByMovementId')
-            ->with($movementId, $page, $limit)
+            ->with($movementId, $page, $limit, $onlyBest)
             ->once()
             ->andReturn($records);
+
         $this->personalRecordRepository
             ->shouldReceive('countRankingByMovementId')
-            ->with($movementId)
+            ->with($movementId, $onlyBest)
             ->once()
             ->andReturn(5);
-        $result = $this->useCase->execute($movementId, $page, $limit);
+
+        $result = $this->useCase->execute($movementId, $page, $limit, $onlyBest);
+
         $this->assertEquals('Deadlift', $result['movement']);
         $this->assertCount(2, $result['ranking']);
         $this->assertEquals([
@@ -180,11 +212,17 @@ class GetMovementRankingTest extends TestCase
 
     public function testExecuteThrowsExceptionWhenMovementNotFound()
     {
-        $this->cache->shouldReceive('get')->once()->andReturn(null);
+        $this->cache
+            ->shouldReceive('get')
+            ->once()
+            ->with("ranking:1:page:1:limit:10:onlyBest:1")
+            ->andReturn(null);
+
         $this->movementRepository
             ->shouldReceive('findById')
             ->once()
             ->andReturn(null);
+
         $this->expectException(MovementNotFoundException::class);
         $this->useCase->execute(1);
     }
