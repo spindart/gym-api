@@ -20,9 +20,22 @@ services:
     networks:
       - app-network
     depends_on:
-      - db
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   db:
     image: mysql:5.7
@@ -38,6 +51,11 @@ services:
       - db_data:/var/lib/mysql
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     command: --default-authentication-plugin=mysql_native_password
 
 networks:

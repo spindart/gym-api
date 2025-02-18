@@ -8,10 +8,12 @@ class CreateInitialTables extends AbstractMigration
     {
         $this->table('user')
             ->addColumn('name', 'string', ['limit' => 255, 'null' => false])
+            ->addIndex(['name'], ['name' => 'idx_user_name'])
             ->create();
 
         $this->table('movement')
             ->addColumn('name', 'string', ['limit' => 255, 'null' => false])
+            ->addIndex(['name'], ['name' => 'idx_movement_name'])
             ->create();
 
         $this->table('personal_record')
@@ -19,6 +21,9 @@ class CreateInitialTables extends AbstractMigration
             ->addColumn('movement_id', 'integer', ['null' => false])
             ->addColumn('value', 'float', ['null' => false])
             ->addColumn('date', 'datetime', ['null' => false])
+            ->addIndex(['movement_id'], ['name' => 'idx_personal_record_movement'])
+            ->addIndex(['user_id'], ['name' => 'idx_personal_record_user'])
+            ->addIndex(['movement_id', 'value'], ['name' => 'idx_personal_record_ranking'])
             ->create();
 
         $this->execute('ALTER TABLE personal_record MODIFY user_id INT UNSIGNED');

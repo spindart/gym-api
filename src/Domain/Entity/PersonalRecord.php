@@ -10,7 +10,7 @@ class PersonalRecord
     private string $userName;
     private float $value;
     private DateTime $date;
-    private int $position;
+    private int $position = 0;
 
     public function __construct(
         int $userId,

@@ -14,10 +14,8 @@ $container = $containerBuilder->build();
 AppFactory::setContainer($container);
 $app = AppFactory::create();
 
-// Adiciona middleware para tratamento de erros
 $app->addErrorMiddleware(true, true, true);
 
-// Rota raiz com documentação básica da API
 $app->get('/', function (Request $request, Response $response) {
     $docs = [
         'api' => 'Movement Ranking API',
@@ -41,10 +39,8 @@ $app->get('/', function (Request $request, Response $response) {
         ->withStatus(200);
 });
 
-// Rota para o ranking de movimentos
 $app->get('/movements/{id}/ranking', MovementRankingController::class);
 
-// Middleware para tratar rotas não encontradas
 $app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function (Request $request, Response $response) {
     $error = [
         'error' => [

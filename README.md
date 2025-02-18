@@ -1,4 +1,13 @@
-# tecnofit
+# Tecnofit API
+
+API para gerenciamento de recordes pessoais de movimentos (exercícios).
+
+## Funcionalidades
+
+- Consulta de ranking por movimento
+- Paginação de resultados
+- Cache com fallback em memória
+- Ordenação por valor (peso) do recorde
 
 ## Pré-requisitos
 
@@ -144,3 +153,48 @@ A API é documentada usando OpenAPI/Swagger. Você pode acessar a documentação
 ### Ambiente Docker
 - Interface Swagger UI: http://localhost/docs
 - Especificação OpenAPI: http://localhost/swagger.php
+
+## Uso da API
+
+### Consultar Ranking de Movimento
+
+```http
+GET /movements/{id}/ranking?page=1&limit=10
+```
+
+#### Parâmetros
+
+- `id` (obrigatório): ID do movimento
+- `page` (opcional): Página atual (padrão: 1)
+- `limit` (opcional): Itens por página (padrão: 10)
+
+#### Exemplo de Resposta
+
+```json
+{
+    "movement": "Deadlift",
+    "ranking": [
+        {
+            "position": 1,
+            "user": "John",
+            "value": 200.0,
+            "date": "2021-01-01 00:00:00"
+        }
+    ],
+    "pagination": {
+        "current_page": 1,
+        "per_page": 10,
+        "total_items": 50,
+        "total_pages": 5
+    }
+}
+```
+
+## Tecnologias
+
+- PHP 8.0+
+- MySQL 5.7
+- Redis
+- Docker
+- Slim Framework
+- PHPUnit

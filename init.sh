@@ -2,11 +2,11 @@
 set -e
 
 echo "Aguardando o MySQL iniciar..."
-TIMEOUT=120  # Aumentado para 2 minutos
+TIMEOUT=120  
 START_TIME=$(date +%s)
 
 until mysqladmin ping -h db -u root -proot --silent; do
-    sleep 5  # Aumentado o intervalo entre tentativas
+    sleep 5 
     ELAPSED_TIME=$(( $(date +%s) - START_TIME ))
     if [ "$ELAPSED_TIME" -ge "$TIMEOUT" ]; then
         echo "Erro: Tempo limite atingido para o MySQL iniciar."
