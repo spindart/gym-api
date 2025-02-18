@@ -11,7 +11,7 @@ API para gerenciamento de recordes pessoais de movimentos (exercícios).
 
 ## Pré-requisitos
 
-- [PHP](https://www.php.net/downloads) (versão 7.4 ou superior)
+- [PHP](https://www.php.net/downloads) (versão 8 ou superior)
 - [Composer](https://getcomposer.org/download/)
 - [MySQL](https://www.mysql.com/downloads/) ou outro banco de dados compatível
 
@@ -189,6 +189,7 @@ GET /movements/{id}/ranking?page=1&limit=10
     }
 }
 ```
+
 
 ## Tecnologias
 

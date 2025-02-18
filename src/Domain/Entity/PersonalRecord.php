@@ -24,6 +24,11 @@ class PersonalRecord
         $this->date = $date;
     }
 
+    public function getUserId(): int
+    {
+        return $this->userId;
+    }
+
     public function setPosition(int $position): void
     {
         $this->position = $position;

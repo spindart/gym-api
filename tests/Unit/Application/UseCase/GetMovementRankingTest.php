@@ -14,10 +14,16 @@ use PHPUnit\Framework\TestCase;
 
 class GetMovementRankingTest extends TestCase
 {
+    /** @var MovementRepositoryInterface|Mockery\MockInterface */
     private $movementRepository;
+    
+    /** @var PersonalRecordRepositoryInterface|Mockery\MockInterface */
     private $personalRecordRepository;
+    
+    /** @var CacheInterface|Mockery\MockInterface */
     private $cache;
-    private $useCase;
+    
+    private GetMovementRanking $useCase;
 
     protected function setUp(): void
     {

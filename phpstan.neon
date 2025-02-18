@@ -4,4 +4,6 @@ parameters:
         - src
         - tests
     excludePaths:
-        - vendor/* 
+        - vendor/*
+    ignoreErrors:
+        - '#Parameter \#[0-9]+ \$[a-zA-Z]+ of class [a-zA-Z\\]+ constructor expects [a-zA-Z\\]+, Mockery\\MockInterface given\.#' 
