@@ -23,7 +23,7 @@ class MySqlMovementRepository implements MovementRepositoryInterface
             WHERE id = ?
         ");
         $stmt->execute([$id]);
-        
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$result) {
             return null;

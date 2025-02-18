@@ -5,6 +5,7 @@ namespace App\Infrastructure\Http\Middleware;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Handlers\ErrorHandler as SlimErrorHandler;
+
 class ErrorHandler extends SlimErrorHandler
 {
     protected function respond(): ResponseInterface

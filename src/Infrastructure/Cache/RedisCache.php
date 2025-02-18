@@ -28,4 +28,4 @@ class RedisCache implements CacheInterface
     {
         $this->redis->del($key);
     }
-} 
+}

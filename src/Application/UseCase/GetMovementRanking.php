@@ -26,7 +26,7 @@ class GetMovementRanking
     public function execute(int $movementId, int $page = 1, int $limit = 10): array
     {
         $cacheKey = "ranking:{$movementId}:page:{$page}:limit:{$limit}";
-        
+
         $cachedResult = $this->cache->get($cacheKey);
         if ($cachedResult !== null) {
             return json_decode($cachedResult, true);

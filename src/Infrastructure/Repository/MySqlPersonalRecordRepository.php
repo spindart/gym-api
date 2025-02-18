@@ -19,7 +19,7 @@ class MySqlPersonalRecordRepository implements PersonalRecordRepositoryInterface
     public function findRankingByMovementId(int $movementId, int $page = 1, int $limit = 10): array
     {
         $offset = ($page - 1) * $limit;
-        
+
         $sql = "
             SELECT 
                 pr.user_id,
@@ -56,7 +56,7 @@ class MySqlPersonalRecordRepository implements PersonalRecordRepositoryInterface
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['movement_id' => $movementId]);
-        
+
         return (int) $stmt->fetch(PDO::FETCH_ASSOC)['total'];
     }
 
