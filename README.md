@@ -193,7 +193,6 @@ GET /movements/{id}/ranking?page=1&limit=10&only_best=false
 }
 ```
 
-
 ## Tecnologias
 
 - PHP 8.0+
